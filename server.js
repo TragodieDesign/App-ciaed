@@ -7,36 +7,50 @@ require('dotenv').config();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.get('/rota-de-processamento', async (req, res) => {
+app.post('/rota-de-processamento', async (req, res) => {
   try {
     const token = process.env.BEARER_TOKEN; // Use a variável de ambiente
-
     const url = 'https://api.mspbackups.com/api/Users';
 
-    // Você pode incluir parâmetros de consulta no URL, se necessário
-    const queryParams = {
-      parametro1: 'valor1',
-      parametro2: 'valor2'
+    // Captura os dados do formulário do WordPress
+    const { nome, sobrenome, email } = req.body;
+
+    // Estrutura dos dados para a API
+    const dadosParaAPI = {
+      Email: email,
+      FirstName: nome,
+      LastName: sobrenome,
+      NotificationEmails: [email],
+      Company: 'CIAED',
+      Enabled: true,
+      Password: 'cadastrociaed123',
+      DestinationList: [
+        {
+          AccountID: 'string',
+          Destination: 'string',
+          PackageID: 0
+        }
+      ],
+      SendEmailInstruction: true,
+      LicenseManagmentMode: 0
     };
 
+    // Configuração dos cabeçalhos com autenticação Bearer
     const headers = {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     };
 
-    const response = await axios.get(url, { params: queryParams, headers });
+    // Solicitação POST para a API
+    const response = await axios.post(url, dadosParaAPI, { headers });
 
-    const dadosDaAPI = response.data; // Dados da API
+    // Manipule a resposta da API, se necessário
+    console.log(response.data);
 
-    console.log(dadosDaAPI); // Imprime os dados no console do servidor
-
-    res.status(200).json({
-      message: 'Conexão com a API bem-sucedida.',
-      data: dadosDaAPI // Envia os dados como parte da resposta HTTP
-    });
+    res.status(200).send('Dados enviados com sucesso para a API.');
   } catch (error) {
     console.error('Erro:', error);
-    res.status(500).send('Ocorreu um erro ao conectar à API.');
+    res.status(500).send('Ocorreu um erro ao enviar os dados para a API.');
   }
 });
 
