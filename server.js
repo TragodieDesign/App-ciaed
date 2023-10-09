@@ -26,7 +26,7 @@ app.post('/rota-de-processamento', async (req, res) => {
   ],
   "Company": CIAED,
   "Enabled": true,
-  "Password": "cadastrociaed123,
+  "Password": "cadastrociaed123",
   "DestinationList": [
     {
       "AccountID": "string",
