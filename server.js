@@ -20,7 +20,7 @@ app.post('/rota-de-processamento', async (req, res) => {
       Email: email,
       FirstName: nome,
       LastName: sobrenome,
-      NotificationEmails: [email],
+      NotificationEmails: email,
       Company: 'CIAED',
       Enabled: true,
       Password: 'cadastrociaed123',
