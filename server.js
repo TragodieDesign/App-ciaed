@@ -16,24 +16,27 @@ app.post('/rota-de-processamento', async (req, res) => {
     const { nome, sobrenome, email } = req.body;
 
     // Estrutura dos dados para a API
-    const dadosParaAPI = {
-      Email: email,
-      FirstName: nome,
-      LastName: sobrenome,
-      NotificationEmails: email,
-      Company: 'CIAED',
-      Enabled: true,
-      Password: 'cadastrociaed123',
-      DestinationList: [
-        {
-          AccountID: 'string',
-          Destination: 'string',
-          PackageID: 0
-        }
-      ],
-      SendEmailInstruction: true,
-      LicenseManagmentMode: 0
-    };
+    const dadosParaAPI = 
+      {{
+  "Email": email,
+  "FirstName": nome,
+  "LastName": sobrenome,
+  "NotificationEmails": [
+    email
+  ],
+  "Company": CIAED,
+  "Enabled": true,
+  "Password": "cadastrociaed123,
+  "DestinationList": [
+    {
+      "AccountID": "string",
+      "Destination": "string",
+      "PackageID": 0
+    }
+  ],
+  "SendEmailInstruction": true,
+  "LicenseManagmentMode": 0
+};}
 
     // Configuração dos cabeçalhos com autenticação Bearer
     const headers = {
