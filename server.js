@@ -17,7 +17,7 @@ app.post('/rota-de-processamento', async (req, res) => {
 
     // Estrutura dos dados para a API
     const dadosParaAPI = 
-      {{
+      {
   "Email": email,
   "FirstName": nome,
   "LastName": sobrenome,
@@ -36,7 +36,7 @@ app.post('/rota-de-processamento', async (req, res) => {
   ],
   "SendEmailInstruction": true,
   "LicenseManagmentMode": 0
-};}
+};
 
     // Configuração dos cabeçalhos com autenticação Bearer
     const headers = {
