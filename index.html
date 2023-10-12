@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+<body>
+  <form id="ciaedForm">
+  <input type="text" id="nome" name="nome" placeholder="Nome">
+  <input type="text" id="sobrenome" name="sobrenome" placeholder="Sobrenome">
+  <input type="email" id="email" name="email" placeholder="E-mail">
+  <button type="submit">Enviar</button>
+</form>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const formulario = document.getElementById('ciaedForm');
+
+  formulario.addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const nome = document.getElementById('nome').value;
+    const sobrenome = document.getElementById('sobrenome').value;
+    const email = document.getElementById('email').value;
+
+    const dadosDoFormulario = {
+      nome,
+      sobrenome,
+      email
+    };
+
+    // Faça a solicitação POST para o seu servidor Render
+    fetch('https://ciaed-rota-de-processamento.onrender.com/rota-de-processamento', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(dadosDoFormulario)
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log(dadosDoFormulario', data);
+      // Lide com a resposta, como exibí-la ao usuário
+    })
+    .catch(error => {
+      console.error('Erro:', error);
+      // Lide com erros, se necessário
+    });
+  });
+});
+</script>
+
+</body>
+</html>
