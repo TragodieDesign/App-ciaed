@@ -1,48 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title></title>
-</head>
-<body>
+
+
 
 <form id="ciaedForm">
-  <h3 style="text-align:center">Garanta seu acesso ao Nublisafety</h3>
-  <label>Nome</label>
+    <h3 style="text-align:center"> Garanta seu acesso ao Nublisafety </h3>
+    <label>Nome</label>
   <input type="text" id="nome" name="nome" placeholder="Digite o seu nome" required>
   <label>Sobrenome</label>
   <input type="text" id="sobrenome" name="sobrenome" placeholder="Digite o seu sobrenome" required>
   <label>E-mail</label>
   <input type="email" id="email" name="email" placeholder="Digite o seu e-mail" required>
 
-  <label>Telefone</label>
+      <label>Telefone</label>
   <input type="tel" id="telefone" name="telefone" placeholder="Digite o seu telefone com DDD" required>
 
-  <label>Empresa</label>
+        <label>Empresa</label>
   <input type="text" id="company" name="Empresa" placeholder="Digite o nome da sua empresa" required>
 
   <div id="submit">
-    <p style="text-align:justify; font-size:10pt;">
-      <input type="checkbox" required> Eu li e concordo com a
-      <a href="https://nublify.com/politica-de-download-de-software-de-backup-nublisafety" style="color:orange; font-weight:bold;">Política de Download de Software de Backup Nublisafety</a>
-    </p>
+      <p style="text-align:justify; font-size:10pt;"><input type="checkbox" required> Eu li e concordo com a <a href="https://nublify.com/politica-de-download-de-software-de-backup-nublisafety/" style="color:orange; font-weight:bold; ">Política de Download de Software de Backup Nublisafety</a>
+
+      </p>
   </div>
-  <!-- Captcha -->
+  <!--Captcha-->
   <div id='recaptcha' class="g-recaptcha" data-sitekey="6Lcp_JIoAAAAAEssnCyKzf0c0gVtxi-Xggd8IMyE" data-callback="sendForm" data-size="invisible"></div>
-  <!-- Fim Captcha -->
+  <!--fim captcha -->
 
-  <!-- Submit -->
+  <!--Submit-->
   <div style="align-items:center; justify-content:center; display:flex;">
-    <button type="submit">Enviar</button>
+      <button type="submit">Enviar</button>
+      <!--Fim submit-->
   </div>
-  <div id="mensagem" style="display: none; text-align: center;">
-    <!-- Mensagem de agradecimento -->
-    <p>Obrigado por enviar o formulário!</p>
-    <!-- Mensagem de e-mail já existente -->
-    <p>O e-mail fornecido já existe.</p>
-  </div>
+      <div id="mensagem" style="display: none; text-align: center;">
+        <p>Obrigado por enviar o formulário!</p>
+    </div>
 </form>
-
 
 <style>
 
@@ -111,7 +102,6 @@
 document.addEventListener('DOMContentLoaded', function () {
   const formulario = document.getElementById('ciaedForm');
   const mensagem = document.getElementById('mensagem');
-
   formulario.addEventListener('submit', function (event) {
     event.preventDefault();
 
@@ -126,41 +116,50 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // Faça a solicitação POST para o seu servidor Render
-    fetch('http://localhost:3000/rota-de-processamento', {
+    fetch('https://ciaed-rota-de-processamento.onrender.com/rota-de-processamento', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(dadosDoFormulario)
     })
-      .then(response => response.json())
-      .then(data => {
-        if (data === 'E-mail já existe') {
-          // E-mail já existe, exiba a mensagem correspondente
-          mensagem.innerHTML = 'O e-mail fornecido já existe.';
-        } else {
-          // Sucesso, exiba a mensagem de agradecimento
-          mensagem.innerHTML = 'Obrigado por enviar o formulário!';
-        }
-        mensagem.style.display = 'block';
+    .then(response => response.json())
+    .then(data => {
+      console.log(dadosDoFormulario, data);
+      // Lide com a resposta, como exibí-la ao usuário
+    })
+    .catch(error => {
+      console.error('Erro:', error);
+      // Lide com erros, se necessário
+    });            // Exiba a mensagem de agradecimento
+            mensagem.style.display = 'block';
 
-        // Limpe o formulário
-        formulario.reset();
-      })
-      .catch(error => {
-        console.error('Erro:', error);
-        // Lide com erros, se necessário
-      });
+            // Limpe o formulário
+            formulario.reset();
+
+               // window.location.href = 'https://nublify.com/ciaed-2023-agradecimento/';
+
   });
+
 });
 
-function sendForm() {
-  alert("reCAPTCHA funcionou");
-}
-
+</script>
+<script type="text/javascript">
+    let form = document.querySelector('#register');
+    form.addEventListener('submit',  e => {
+        e.preventDefault();
+        let name = document.querySelector('#name');
+        let email = document.querySelector('#email');
+        if(!name.value || !email.value) {
+            alert('Nome e Email são Obrigatorios');
+            } else{
+            grecaptcha.execute();
+        }
+        });
+    function sendForm(){
+        alert("reCAPTCHA funcionou");
+    }
 </script>
 
 
 
- </body>
-</html>
