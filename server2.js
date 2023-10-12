@@ -8,55 +8,44 @@ app.use(cors());
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "https://www.nublify.com/ciaed");
-  res.header("Access-Control-Allow-Origin", "http://localhost:8080/form.html");
-  res.header("Access-Control-Allow-Methods", "POST");
+  res.header("Access-Control-Allow-Methods", "POST, GET"); // Adicione o método GET
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   next();
 });
 
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true });
 app.use(express.json());
 
 app.post('/rota-de-processamento', async (req, res) => {
   try {
-    const token = process.env.BEARER_TOKEN; // Use a variável de ambiente
+    const token = process.env.BEARER_TOKEN;
     const url = 'https://api.mspbackups.com/api/Users';
 
-    // Captura os dados do formulário do WordPress
     const { nome, sobrenome, email } = req.body;
 
-    // Verifique se o e-mail já existe na API
-    const emailExists = await checkEmailExists(email);
-
-    if (emailExists) {
-      // Se o e-mail já existe, retorne um erro
-      res.status(400).send('O e-mail já existe na API.');
-      return;
-    }
-
-    // Se o e-mail não existe, continue com o envio para a API
+    // Estrutura dos dados para a API
     const dadosParaAPI = {
-      Email: email,
-      FirstName: nome,
-      LastName: sobrenome,
-      NotificationEmails: [email],
-      Company: "CIAED",
-      Enabled: true,
-      Password: "cadastrociaed123",
-      DestinationList: [
+      "Email": email,
+      "FirstName": nome,
+      "LastName": sobrenome,
+      "NotificationEmails": [email],
+      "Company": "CIAED",
+      "Enabled": true,
+      "Password": "cadastrociaed123",
+      "DestinationList": [
         {
-          AccountID: "string",
-          Destination: "string",
-          PackageID: 0
+          "AccountID": "string",
+          "Destination": "string",
+          "PackageID": 0
         }
       ],
-      SendEmailInstruction: true,
-      LicenseManagmentMode: 0
+      "SendEmailInstruction": true,
+      "LicenseManagmentMode": 0
     };
 
     // Configuração dos cabeçalhos com autenticação Bearer
     const headers = {
-      Authorization: `Bearer ${token}`,
+      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     };
 
@@ -73,21 +62,30 @@ app.post('/rota-de-processamento', async (req, res) => {
   }
 });
 
+app.get('/verificar-email', async (req, res) => {
+  try {
+    // Recupera o e-mail da query string
+    const email = req.query.email;
+
+    // Faça a solicitação GET para a API da MSPBackups
+    const url = 'https://api.mspbackups.com/api/Users';
+    const response = await axios.get(url);
+
+    // Verifique se o e-mail existe na resposta da API
+    const emailExiste = response.data.some(user => user.Email === email);
+
+    // Imprima o resultado no console
+    console.log(`E-mail ${email} existe na API: ${emailExiste}`);
+
+    // Envie uma resposta adequada para o cliente
+    res.status(200).json({ emailExiste });
+  } catch (error) {
+    console.error('Erro:', error);
+    res.status(500).send('Ocorreu um erro ao verificar o e-mail.');
+  }
+});
+
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
 });
-
-// Função para verificar se o e-mail já existe na API
-async function checkEmailExists(email) {
-  try {
-    const response = await axios.get('https://api.mspbackups.com/seu-endpoint-de-verificacao/' + email);
-
-    // A API deve retornar verdadeiro (true) se o e-mail já existir
-    return response.data === true;
-  } catch (error) {
-    // Em caso de erro, retorne falso (false)
-    console.error('Erro ao verificar o e-mail:', error);
-    return false;
-  }
-}
 
