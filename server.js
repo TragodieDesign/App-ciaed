@@ -15,7 +15,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.urlencoded({ extended: true });
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.post('/rota-de-processamento', async (req, res) => {
