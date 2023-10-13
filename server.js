@@ -47,7 +47,7 @@ app.post('/rota-de-processamento', async (req, res) => {
 
     // Antes de enviar para a API do MSP Backups, verifique o e-mail
     const verificarEmailResponse = await axios.get(
-      `https://seuservidor/verificar-email?email=${email}`
+      `https://ciaed-rota-de-processamento.onrender.com/rota-de-processamento/verificar-email?email=${email}`
     );
 
     if (verificarEmailResponse.data.emailJaExiste) {
