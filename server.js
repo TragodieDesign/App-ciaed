@@ -67,7 +67,7 @@ app.post('/rota-de-processamento', async (req, res) => {
       const emailExists = users.some(user => user.Email === email);
 
       if (emailExists) {
-        res.status(200).send('Este e-mail já foi cadastrado.');
+        res.status(200).json({ message: 'Este e-mail já foi cadastrado.' });
       } else {
         // Se o e-mail não existe, continue com o envio para a API
         const postResponse = await axios.post(url, dadosParaAPI, { headers });
@@ -75,7 +75,7 @@ app.post('/rota-de-processamento', async (req, res) => {
         // Manipule a resposta da API, se necessário
         console.log(postResponse.data);
 
-        res.status(200).send('Dados enviados com sucesso para a API.');
+        res.status(200).json({ message: 'Dados enviados com sucesso para a API.' });
       }
     } else {
       res.status(500).send('Erro ao buscar usuários na API.');
