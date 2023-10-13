@@ -51,7 +51,6 @@ app.post('/rota-de-processamento', async (req, res) => {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     };
-
     // Solicitação POST para a API
     const response = await axios.post(url, dadosParaAPI, { headers });
 
@@ -65,15 +64,23 @@ app.post('/rota-de-processamento', async (req, res) => {
     if (getUsersResponse.status === 200) {
       const users = getUsersResponse.data;
 
-      // Itera sobre os usuários para comparar os e-mails
-      users.forEach(user => {
-        if (user.Email === email) {
-          console.log(`E-mail ${email} encontrado na lista de usuários.`);
-        }
-      });
-    }
+      // Verifica se o e-mail já existe na lista de usuários
+      const emailExists = users.some(user => user.Email === email);
 
-    res.status(200).send('Dados enviados com sucesso para a API.');
+      if (emailExists) {
+        res.status(200).send('Este e-mail já foi cadastrado.');
+      } else {
+        // Se o e-mail não existe, continue com o envio para a API
+        const postResponse = await axios.post(url, dadosParaAPI, { headers });
+
+        // Manipule a resposta da API, se necessário
+        console.log(postResponse.data);
+
+        res.status(200).send('Dados enviados com sucesso para a API.');
+      }
+    } else {
+      res.status(500).send('Erro ao buscar usuários na API.');
+    }
   } catch (error) {
     console.error('Erro:', error);
     res.status(500).send('Ocorreu um erro ao enviar os dados para a API.');
