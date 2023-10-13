@@ -26,7 +26,7 @@ app.post('/rota-de-processamento', async (req, res) => {
     const { nome, sobrenome, email } = req.body;
 
     // Estrutura dos dados para a API
-    const dadosParaAPI = 
+    const dadosParaAPI =
       {
   "Email": email,
   "FirstName": nome,
