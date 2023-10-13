@@ -24,8 +24,30 @@ app.post('/rota-de-processamento', async (req, res) => {
     const companiesUrl = 'https://api.mspbackups.com/api/Companies';
     const { nome, sobrenome, email, company } = req.body;
 
-    // 1. Valide o e-mail
-    const getUsersResponse = await axios.get(usersUrl, { headers });
+    // 1. Crie a empresa
+    const empresaHeaders = {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
+    const empresaDados = {
+      "Name": `CIAED ${company}`,
+      "StorageLimit": 536870912000,
+      "LicenseSettings": 0,
+      "Destinations": [
+        {
+          "DestinationId": "33b3f17f-5b96-4870-b108-0314d8032e7e"
+        }
+      ]
+    };
+    const empresaResponse = await axios.post(companiesUrl, empresaDados, { headers: empresaHeaders });
+
+    if (empresaResponse.status !== 200) {
+      res.status(500).send('Erro ao criar a empresa.');
+      return;
+    }
+
+    // 2. Verifique se o e-mail já existe
+    const getUsersResponse = await axios.get(usersUrl, { headers: empresaHeaders });
     if (getUsersResponse.status !== 200) {
       res.status(500).send('Erro ao buscar usuários na API.');
       return;
@@ -39,25 +61,11 @@ app.post('/rota-de-processamento', async (req, res) => {
       return;
     }
 
-    // 2. Crie a empresa
-    const empresaDados = {
-      "Name": `CIAED ${company}`,
-      "StorageLimit": 536870912000,
-      "LicenseSettings": 0,
-      "Destinations": [
-        {
-          "DestinationId": "33b3f17f-5b96-4870-b108-0314d8032e7e"
-        }
-      ]
-    };
-    const empresaResponse = await axios.post(companiesUrl, empresaDados, { headers });
-
-    if (empresaResponse.status !== 200) {
-      res.status(500).send('Erro ao criar a empresa.');
-      return;
-    }
-
     // 3. Crie o novo usuário
+    const usuarioHeaders = {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
     const dadosParaAPI = {
       "Email": email,
       "FirstName": nome,
@@ -76,7 +84,7 @@ app.post('/rota-de-processamento', async (req, res) => {
       "SendEmailInstruction": true,
       "LicenseManagmentMode": 0
     };
-    const postResponse = await axios.post(usersUrl, dadosParaAPI, { headers });
+    const postResponse = await axios.post(usersUrl, dadosParaAPI, { headers: usuarioHeaders });
 
     if (postResponse.status === 200) {
       res.status(200).json({ message: 'Dados enviados com sucesso para a API.', emailExists: false });
