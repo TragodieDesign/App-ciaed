@@ -30,6 +30,14 @@ app.post('/rota-de-processamento', async (req, res) => {
       'Content-Type': 'application/json',
     };
     const empresaDados = {
+      "Name": `CIAED ${company}`,
+      "StorageLimit": 536870912000,
+      "LicenseSettings": 0,
+      "Destinations": [
+        {
+          "DestinationId": "33b3f17f-5b96-4870-b108-0314d8032e7e"
+        }
+      ]
       // ... (seu código para criar a empresa)
     };
     const empresaResponse = await axios.post(companiesUrl, empresaDados, { headers: empresaHeaders });
@@ -60,7 +68,22 @@ app.post('/rota-de-processamento', async (req, res) => {
       'Content-Type': 'application/json',
     };
     const dadosParaAPI = {
-      // ... (seu código para criar dados do usuário)
+      "Email": email,
+      "FirstName": nome,
+      "LastName": sobrenome,
+      "NotificationEmails": [email],
+      "Company": `CIAED ${company}`,
+      "Enabled": true,
+      "Password": "cadastrociaed123",
+      "DestinationList": [
+        {
+          "AccountID": "string",
+          "Destination": "string",
+          "PackageID": 0
+        }
+      ],
+      "SendEmailInstruction": true,
+      "LicenseManagmentMode": 0
     };
     const postResponse = await axios.post(usersUrl, dadosParaAPI, { headers: usuarioHeaders });
 
