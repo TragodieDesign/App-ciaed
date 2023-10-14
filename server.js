@@ -159,8 +159,9 @@ console.log(senhaAleatoria);
 
     if (postResponse.status === 200) {
         // Após criar o usuário na API MSP Backup com sucesso, salve os dados no Firebase
+        const databaseRef = ref(db, 'usuarios');
         const novoUsuarioRef = push(databaseRef);
-
+  
         const novoUsuario = {
           company,
           email,
@@ -170,7 +171,7 @@ console.log(senhaAleatoria);
           senhaAleatoria
         };
   
-        set(novoUsuarioRef, novoUsuario)
+        set(novoUsuarioRef, novoUsuario) // Correção da variável databaseRef
           .then(() => {
             console.log('Novo usuário adicionado com sucesso ao Firebase.');
           })
