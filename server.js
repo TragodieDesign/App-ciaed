@@ -28,9 +28,17 @@ app.post('/rota-de-processamento', async (req, res) => {
     const empresaHeaders = {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
-    };
-    const empresaDados = {
-      "Name": `CIAED ${company}`,
+    }; // Verifique se a empresa já existe
+    const empresaExisteResponse = await axios.get(companiesUrl, { headers: empresaHeaders });
+    if (empresaExisteResponse.status === 200) {
+      const empresas = empresaExisteResponse.data;
+      const empresaJaExiste = empresas.some(empresa => empresa.Name === `CIAED ${company}`);
+    
+      if (!empresaJaExiste) {
+        // A empresa não existe, crie-a
+        const empresaDados = {
+          // ... (seu código para criar a empresa)
+          "Name": `CIAED ${company}`,
       "StorageLimit": 536870912000,
       "LicenseSettings": 0,
       "Destinations": [
@@ -38,13 +46,14 @@ app.post('/rota-de-processamento', async (req, res) => {
           "DestinationId": "33b3f17f-5b96-4870-b108-0314d8032e7e"
         }
       ]
-      // ... (seu código para criar a empresa)
-    };
-    const empresaResponse = await axios.post(companiesUrl, empresaDados, { headers: empresaHeaders });
-
-    if (empresaResponse.status !== 200) {
-      res.status(500).send('Erro ao criar a empresa.');
-      return;
+        };
+        const empresaResponse = await axios.post(companiesUrl, empresaDados, { headers: empresaHeaders });
+    
+        if (empresaResponse.status !== 200) {
+          res.status(500).send('Erro ao criar a empresa.');
+          return;
+        }
+      }
     }
 
     // 2. Verifique se o e-mail já existe
@@ -172,7 +181,7 @@ Você terá acesso gratuíto a uma plataforma completa de backup on-line por 15 
         ,
       })
         .then(info => {
-          console.log('Email de resposta enviado:', info);
+          console.log('Email de resposta enviado:');
         })
         .catch(error => {
           console.error('Erro ao enviar email de resposta:', error);
