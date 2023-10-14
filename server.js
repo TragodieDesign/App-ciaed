@@ -76,6 +76,28 @@ app.post('/rota-de-processamento', async (req, res) => {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     };
+    
+// Função para gerar uma senha aleatória
+function generateRandomPassword(length) {
+  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-+=<>?";
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * charset.length);
+    password += charset[randomIndex];
+  }
+  return password;
+}
+
+// Use a função para gerar uma senha aleatória de 12 caracteres
+const senhaAleatoria = generateRandomPassword(12);
+
+// Imprima a senha aleatória
+console.log(senhaAleatoria);
+
+
+
+
+
     const dadosParaAPI = {
       "Email": email,
       "FirstName": nome,
@@ -83,7 +105,7 @@ app.post('/rota-de-processamento', async (req, res) => {
       "NotificationEmails": [email],
       "Company": `CIAED ${company}`,
       "Enabled": true,
-      "Password": "cadastrociaed123",
+      "Password": `${senhaAleatoria}`,
       "DestinationList": [
         {
           "AccountID": "string",
@@ -115,7 +137,7 @@ app.post('/rota-de-processamento', async (req, res) => {
         from: user,
         to: email, // Use o email coletado anteriormente
         replyTo: 'teste@os.santacasasbc.org.br',
-        subject: 'Cadastro bem-sucedido',
+        subject: 'Nublisafety Login Information',
         html: `<!doctype html>
         <html>
   <body>
@@ -123,7 +145,7 @@ app.post('/rota-de-processamento', async (req, res) => {
       <tr>
         <td>
           <p style="font-family: Verdana;   font-size: 12px;   FONT-WEIGHT: normal;   COLOR: #242c3b;   TEXT-DECORATION: none">
-            Olá, %USERNAME%. Seja bem-vindo(a)!</p>
+            Olá, ${nome} . Seja bem-vindo(a)!</p>
           <p style="font-family: Verdana;   font-size: 12px;   FONT-WEIGHT: normal;   COLOR: #242c3b;   TEXT-DECORATION: none">
 			Esta mensagem contém seu acesso gratuito ao <b>NubliSafety</b>, software de Backup em Nuvem da <b>Nublify</b>.</p>
 <p style="font-family: Verdana;   font-size: 12px;   FONT-WEIGHT: normal;   COLOR: #242c3b;   TEXT-DECORATION: none">
@@ -131,8 +153,8 @@ Você terá acesso gratuíto a uma plataforma completa de backup on-line por 15 
 </p>
         <p style="font-family: Verdana;   font-size: 12px;   FONT-WEIGHT: normal;   COLOR: #242c3b;   TEXT-DECORATION: none">
 			Para acessar sua conta de backup online, utilize as informações abaixo:<br/><br/>
-			Login: <b>%EMAIL%</b><br/>
-			Password: <b>%PASSWORD%</b><br/><br>
+			Login: <b>${email}</b><br/>
+			Password: <b>${senhaAleatoria}</b><br/><br>
 			(Você pode alterar a senha no próprio produto, quando quiser).<br/></p>          
 			
 		<p style="font-family: Verdana;   font-size: 12px;   FONT-WEIGHT: normal;   COLOR: #242c3b;   TEXT-DECORATION: none">
