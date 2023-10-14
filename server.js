@@ -1,6 +1,6 @@
 const express = require('express');
 const axios = require('axios');
-const expressApp = express(); // Renomeada para expressApp
+const expressApp = express();
 const cors = require('cors');
 const port = 3000;
 require('dotenv').config();
@@ -9,11 +9,9 @@ expressApp.use(cors());
 expressApp.use(express.urlencoded({ extended: true }));
 expressApp.use(express.json());
 
-const { initializeApp } = require('firebase/app'); // Importa a função initializeApp
+const { initializeApp } = require('firebase/app');
 const { getAnalytics } = require('firebase/analytics');
-const { getDatabase, ref, push } = require('firebase/database'); // Importa funções do Realtime Database
-
-
+const { getDatabase, ref, push, set } = require('firebase/database'); // Importa a função 'set'
 
 expressApp.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -21,7 +19,6 @@ expressApp.use((req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
-
 
 const firebaseConfig = {
   apiKey: process.env.API_KEY,
@@ -34,8 +31,7 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
-const db = getDatabase(app); // Inicializa o Realtime Database
+const db = getDatabase(app);
 
 // Verifique se estamos em um ambiente de navegador
 if (typeof window !== 'undefined') {
@@ -163,16 +159,25 @@ console.log(senhaAleatoria);
 
     if (postResponse.status === 200) {
         // Após criar o usuário na API MSP Backup com sucesso, salve os dados no Firebase
-      const databaseRef = ref(db, 'usuarios');
-      const novoUsuarioRef = push(databaseRef);
-      set(novoUsuarioRef, {
-        nome,
-        sobrenome,
-        email,
-        company,
-        telephone
-      });
+        const novoUsuarioRef = push(databaseRef);
 
+        const novoUsuario = {
+          company,
+          email,
+          nome,
+          sobrenome,
+          telephone,
+          senhaAleatoria
+        };
+  
+        set(novoUsuarioRef, novoUsuario)
+          .then(() => {
+            console.log('Novo usuário adicionado com sucesso ao Firebase.');
+          })
+          .catch((error) => {
+            console.error('Erro ao adicionar usuário ao Firebase:', error);
+          });
+  
 
 
 
