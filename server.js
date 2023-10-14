@@ -1,28 +1,65 @@
 const express = require('express');
 const axios = require('axios');
-const app = express();
+const expressApp = express(); // Renomeada para expressApp
 const cors = require('cors');
-const port = 3000; // Porta do servidor
+const port = 3000;
 require('dotenv').config();
 const nodemailer = require('nodemailer');
-app.use(cors());
+expressApp.use(cors());
+expressApp.use(express.urlencoded({ extended: true }));
+expressApp.use(express.json());
 
-app.use((req, res, next) => {
+const { initializeApp } = require('firebase/app'); // Importa a função initializeApp
+const { getAnalytics } = require('firebase/analytics');
+const { getDatabase, ref, push } = require('firebase/database'); // Importa funções do Realtime Database
+
+
+
+expressApp.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'POST');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
 
-app.post('/rota-de-processamento', async (req, res) => {
+const firebaseConfig = {
+  apiKey: process.env.API_KEY,
+  authDomain: process.env.AUTH_DOMAIN,
+  projectId: process.env.PROJECT_ID,
+  storageBucket: process.env.STORAGE_BUCKET,
+  messagingSenderId: process.env.MESSAGING_SENDER_ID,
+  appId: process.env.APP_ID,
+  measurementId: process.env.MEASUREMENT_ID,
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getDatabase(app); // Inicializa o Realtime Database
+
+// Verifique se estamos em um ambiente de navegador
+if (typeof window !== 'undefined') {
+  
+  const analytics = getAnalytics(app);
+} else {
+  console.warn('Firebase Analytics não é suportado neste ambiente.');
+  // Lide com a falta de suporte ou execute código alternativo, se necessário
+}
+
+
+
+expressApp.post('/rota-de-processamento', async (req, res) => {
   try {
     const token = process.env.BEARER_TOKEN;
     const usersUrl = 'https://api.mspbackups.com/api/Users';
     const companiesUrl = 'https://api.mspbackups.com/api/Companies';
     const { nome, sobrenome, email, company } = req.body;
+
+
+
+
+
+
 
     // 1. Crie a empresa
     const empresaHeaders = {
@@ -33,7 +70,7 @@ app.post('/rota-de-processamento', async (req, res) => {
     if (empresaExisteResponse.status === 200) {
       const empresas = empresaExisteResponse.data;
       const empresaJaExiste = empresas.some(empresa => empresa.Name === `CIAED ${company}`);
-    
+
       if (!empresaJaExiste) {
         // A empresa não existe, crie-a
         const empresaDados = {
@@ -48,7 +85,7 @@ app.post('/rota-de-processamento', async (req, res) => {
       ]
         };
         const empresaResponse = await axios.post(companiesUrl, empresaDados, { headers: empresaHeaders });
-    
+
         if (empresaResponse.status !== 200) {
           res.status(500).send('Erro ao criar a empresa.');
           return;
@@ -76,7 +113,7 @@ app.post('/rota-de-processamento', async (req, res) => {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     };
-    
+
 // Função para gerar uma senha aleatória
 function generateRandomPassword(length) {
   const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-+=<>?";
@@ -118,7 +155,27 @@ console.log(senhaAleatoria);
     };
     const postResponse = await axios.post(usersUrl, dadosParaAPI, { headers: usuarioHeaders });
 
+
+
+
+
+
+
     if (postResponse.status === 200) {
+        // Após criar o usuário na API MSP Backup com sucesso, salve os dados no Firebase
+      const databaseRef = ref(db, 'usuarios');
+      const novoUsuarioRef = push(databaseRef);
+      set(novoUsuarioRef, {
+        nome,
+        sobrenome,
+        email,
+        company,
+        telephone
+      });
+
+
+
+
       // Enviar email de resposta
       const email = req.body.email; // Coleta o email do formulário
       const user = process.env.NODEMAILER_EMAIL; // Substitua pelo seu email
@@ -155,27 +212,27 @@ Você terá acesso gratuíto a uma plataforma completa de backup on-line por 15 
 			Para acessar sua conta de backup online, utilize as informações abaixo:<br/><br/>
 			Login: <b>${email}</b><br/>
 			Password: <b>${senhaAleatoria}</b><br/><br>
-			(Você pode alterar a senha no próprio produto, quando quiser).<br/></p>          
-			
+			(Você pode alterar a senha no próprio produto, quando quiser).<br/></p>
+
 		<p style="font-family: Verdana;   font-size: 12px;   FONT-WEIGHT: normal;   COLOR: #242c3b;   TEXT-DECORATION: none">
             . Baixe a versão <a href="https://s3.amazonaws.com/cb_setups/MBS/12C51D41-8DC7-4C2F-90B1-5178391BB1E7/mac_Nublify_NublifyBackup_v4.1.2.258_20230612182722_12c51d41-8dc7-4c2f-90b1-5178391bb1e7.pkg">macOS</a> do produto. 4.1.2.258.
         </p>
 		<p style="font-family: Verdana;   font-size: 12px;   FONT-WEIGHT: normal;   COLOR: #242c3b;   TEXT-DECORATION: none">
             . Baixe a versão <a href="https://s3.amazonaws.com/cb_setups/MBS/12C51D41-8DC7-4C2F-90B1-5178391BB1E7/Brands/D7E1D238-1914-4E16-A66E-677377A72154/NublifyNublifyBackup_v7.9.0.401_VMWARE_Setup.exe">Windows</a> do produto. 7.9.0.401.
         </p>
-         
+
         <p style="font-family: Verdana;   font-size: 12px;   FONT-WEIGHT: normal;   COLOR: #242c3b;   TEXT-DECORATION: none">
             . Baixe a versão <a href="https://s3.amazonaws.com/cb_setups/MBS/12C51D41-8DC7-4C2F-90B1-5178391BB1E7/Brands/D7E1D238-1914-4E16-A66E-677377A72154/NublifyNublifyBackup_v7.9.0.401_VMWARE_Setup.exe">VMWare Virtual Machine</a> do produto. 7.9.0.401.
         </p>
-        
+
         <p style="font-family: Verdana;   font-size: 12px;   FONT-WEIGHT: normal;   COLOR: #242c3b;   TEXT-DECORATION: none">
             . Baixe a versão <a href="https://s3.amazonaws.com/cb_setups/MBS/12C51D41-8DC7-4C2F-90B1-5178391BB1E7/rh6_Nublify_NublifyBackup_v4.1.4.709_20230912021639.rpm">Linux (RPM)</a> do produto. 4.1.4.709.
         </p>
-        
+
         <p style="font-family: Verdana;   font-size: 12px;   FONT-WEIGHT: normal;   COLOR: #242c3b;   TEXT-DECORATION: none">
             . Baixe a versão <a href="https://s3.amazonaws.com/cb_setups/MBS/12C51D41-8DC7-4C2F-90B1-5178391BB1E7/ubuntu14_Nublify_NublifyBackup_v4.1.2.258_20230612195558.deb">Linux (DEB)</a> do produto. 4.1.2.258.
         </p>
-        
+
         <p style="font-family: Verdana;   font-size: 12px;   FONT-WEIGHT: normal;   COLOR: #242c3b;   TEXT-DECORATION: none">
             Caso tenha dúvidas sobre a utilização do produto. Baixe o <a href="https://drive.google.com/file/d/1Sar2_Gag5CGFrlmASDHtKk_Zt9AXJgGl/view?usp=sharing" target="_blank">Manual do Usuário</a>.
         </p>
@@ -194,12 +251,12 @@ Você terá acesso gratuíto a uma plataforma completa de backup on-line por 15 
     </table>
   </body>
 </html>
-        
-        
+
+
         `
-        
-        
-        
+
+
+
         ,
       })
         .then(info => {
@@ -219,7 +276,7 @@ Você terá acesso gratuíto a uma plataforma completa de backup on-line por 15 
   }
 });
 
-app.listen(port, () => {
+expressApp.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
 });
 
