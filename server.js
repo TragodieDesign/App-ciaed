@@ -4,6 +4,7 @@ const app = express();
 const cors = require('cors');
 const port = 3000; // Porta do servidor
 require('dotenv').config();
+const nodemailer = require ('nodemailer');
 app.use(cors());
 
 app.use((req, res, next) => {
@@ -101,4 +102,28 @@ app.post('/rota-de-processamento', async (req, res) => {
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
 });
+
+const user = "teste@os.santacasasbc.org.br"
+const pass= "$4g37hOOmB5"
+
+app.get('/send', (req, res)=>{
+  const transporter=nodemailer.createTransport({
+    host: "artemis.tdnx.net" ,
+    port: 465,
+    auth: {user:user ,pass:pass}
+  })
+  transporter.sendMail({
+    from:user,
+    to:"brunomachado7501@proton.me",
+    replyTo:"teste@os.santacasasbc.org.br",
+    subject:"teste",
+    text:"Teste bem-sucedido"
+  }).then(info =>{
+    res.send(info)
+  }).catch(error=>{
+    res.send(error)
+  })
+})
+
+
 
