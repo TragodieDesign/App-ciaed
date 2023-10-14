@@ -107,13 +107,8 @@ expressApp.post('/rota-de-processamento', async (req, res) => {
     if (emailExists) {
       res.status(200).json({ message: 'Este e-mail já foi cadastrado.', emailExists: true });
       return;
-    }
+    } console.log("E-mail já cadastrado")
 
-    // 3. Crie o novo usuário
-    const usuarioHeaders = {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    };
 
 // Função para gerar uma senha aleatória
 function generateRandomPassword(length) {
@@ -132,36 +127,16 @@ const senhaAleatoria = generateRandomPassword(12);
 // Imprima a senha aleatória
 console.log(senhaAleatoria);
 
-
-        // Após criar o usuário na API MSP Backup com sucesso, salve os dados no Firebase
-        const databaseRef = ref(db, 'usuarios');
-        const novoUsuarioRef = push(databaseRef);
-    
-        const novoUsuario = {
-          
-          // Aqui 'email' refere-se à variável desestruturada
-          nome,
-          sobrenome,
-          email, 
-          company,
-          telephone,
-          senhaAleatoria
-        };
-    
-        set(novoUsuarioRef, novoUsuario)
-          .then(() => {
-            console.log('Novo usuário adicionado com sucesso ao Firebase.');
-          })
-          .catch((error) => {
-            console.error('Erro ao adicionar usuário ao Firebase:', error);
-          });
-
-
+    // 3. Crie o novo usuário
+    const usuarioHeaders = {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
     const dadosParaAPI = {
       "Email": email,
       "FirstName": nome,
       "LastName": sobrenome,
-      "NotificationEmails": email,
+      "NotificationEmails": [email],
       "Company": `CIAED ${company}`,
       "Enabled": true,
       "Password": `${senhaAleatoria}`,
@@ -176,7 +151,40 @@ console.log(senhaAleatoria);
       "LicenseManagmentMode": 0
     };
     const postResponse = await axios.post(usersUrl, dadosParaAPI, { headers: usuarioHeaders });
+    if (postResponse.status === 200) {
+      res.status(200).json({ message: 'Dados enviados com sucesso para a API.', emailExists: false });
+    } else {
+      res.status(500).send('Erro ao criar o novo usuário.', error);
+    }
 
+
+
+    if (postResponse.status ===200){
+      
+             // Após criar o usuário na API MSP Backup com sucesso, salve os dados no Firebase
+             const databaseRef = ref(db, 'usuarios');
+             const novoUsuarioRef = push(databaseRef);
+         
+             const novoUsuario = {
+               
+               // Aqui 'email' refere-se à variável desestruturada
+               nome,
+               sobrenome,
+               email, 
+               company,
+               telephone,
+               senhaAleatoria
+             };
+         
+             set(novoUsuarioRef, novoUsuario)
+               .then(() => {
+                 console.log('Novo usuário adicionado com sucesso ao Firebase.');
+               })
+               .catch((error) => {
+                 console.error('Erro ao adicionar usuário ao Firebase:', error);
+               });
+     
+    }
 
 
 
@@ -272,7 +280,7 @@ Você terá acesso gratuíto a uma plataforma completa de backup on-line por 15 
         ,
       })
         .then(info => {
-          console.log('Email de resposta enviado:');
+          console.log('Email de resposta enviado!');
         })
         .catch(error => {
           console.error('Erro ao enviar email de resposta:', error);
