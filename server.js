@@ -35,7 +35,7 @@ const db = getDatabase(app);
 
 // Verifique se estamos em um ambiente de navegador
 if (typeof window !== 'undefined') {
-  
+
   const analytics = getAnalytics(app);
 } else {
   console.warn('Firebase Analytics não é suportado neste ambiente.');
@@ -45,7 +45,7 @@ if (typeof window !== 'undefined') {
 
 
 expressApp.post('/rota-de-processamento', async (req, res) => {
-  let email = ''; 
+  let email = '';
 
   try {
     const token = process.env.BEARER_TOKEN;
@@ -147,7 +147,7 @@ console.log(senhaAleatoria);
           "PackageID": 0
         }
       ],
-      "SendEmailInstruction": true,
+      "SendEmailInstruction": false,
       "LicenseManagmentMode": 0
     };
     const postResponse = await axios.post(usersUrl, dadosParaAPI, { headers: usuarioHeaders });
@@ -160,22 +160,22 @@ console.log(senhaAleatoria);
 
 
     if (postResponse.status ===200){
-      
+
              // Após criar o usuário na API MSP Backup com sucesso, salve os dados no Firebase
              const databaseRef = ref(db, 'usuarios');
              const novoUsuarioRef = push(databaseRef);
-         
+
              const novoUsuario = {
-               
+
                // Aqui 'email' refere-se à variável desestruturada
                nome,
                sobrenome,
-               email, 
+               email,
                company,
                telephone,
                senhaAleatoria
              };
-         
+
              set(novoUsuarioRef, novoUsuario)
                .then(() => {
                  console.log('Novo usuário adicionado com sucesso ao Firebase.');
@@ -183,7 +183,7 @@ console.log(senhaAleatoria);
                .catch((error) => {
                  console.error('Erro ao adicionar usuário ao Firebase:', error);
                });
-     
+
     }
 
 
