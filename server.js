@@ -152,7 +152,7 @@ console.log(senhaAleatoria);
     };
     const postResponse = await axios.post(usersUrl, dadosParaAPI, { headers: usuarioHeaders });
     if (postResponse.status === 200) {
-      res.status(200).json({ message: 'Dados enviados com sucesso para a API.', emailExists: false });
+      res.status(200).json({ message: 'Dados enviados com sucesso para a API.', emailExists: false, telephone });
     } else {
       res.status(500).send('Erro ao criar o novo usuário.', error);
     }
